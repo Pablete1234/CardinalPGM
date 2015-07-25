@@ -335,7 +335,6 @@ public class ScoreboardModule implements Module {
                 hasObjectives = true;
             }
         }
-        Class objective = getSpecificObjective();
         if (hasObjectives) {
             if (objective != null) {
                 if (objective.equals(WoolObjective.class)) {

@@ -87,6 +87,8 @@
         <teamAlreadyDefault>Team chat is already your default channel.</teamAlreadyDefault>
         <adminAlreadyDefault>Administrator chat is already your default channel.</adminAlreadyDefault>
         <consoleNoUse>Console cannot use this command.</consoleNoUse>
+        <proximityObsOnly>The /proximity command is only available to observers</proximityObsOnly>
+        <proximityNoScoring>There are no objectives that track proximity</proximityNoScoring>
     </error>
     <generic>
         <mapSet>Next map set to {0}</mapSet>
