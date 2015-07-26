@@ -389,7 +389,7 @@ public class CoreObjective implements GameObjective {
 
     @EventHandler
     public void onBucketEmpty(PlayerBucketEmptyEvent event) {
-        if (region.contains(event.getBlockClicked().getLocation()) && event.getBucket() == Material.LAVA_BUCKET)
+        if (region.contains(event.getBlockClicked().getRelative(event.getBlockFace()).getLocation()) && event.getBlockClicked().getRelative(event.getBlockFace()).getType() == Material.STATIONARY_LAVA)
             event.setCancelled(true);
     }
 
