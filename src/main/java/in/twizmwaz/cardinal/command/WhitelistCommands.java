@@ -151,21 +151,17 @@ public class WhitelistCommands {
         ChatUtil.getGlobalChannel().sendLocalizedMessage(new UnlocalizedChatMessage(ChatColor.RED + "{0}", ChatConstant.GENERIC_KICKED_NOT_WHITELISTED.asMessage()));
     }
 
-    @Command(aliases = {"team"}, desc = "Adds everyone on a team to the whitelist.", max = 1, min = 1)
+    @Command(aliases = {"team"}, desc = "Adds everyone on a team to the whitelist.", min = 1)
     @CommandPermissions("cardinal.whitelist.team")
     public static void team(final CommandContext args, final CommandSender sender) throws CommandException {
         int count = 0;
-        String msg = "";
-        for (int i = 2; i < args.argsLength(); i++) {
-            msg += args.getString(i) + " ";
-        }
-        msg = msg.trim();
+        String msg = args.getJoinedStrings(0).toLowerCase();
         if (Teams.getTeamByName(msg) == null) {
             throw new CommandException(new LocalizedChatMessage(ChatConstant.ERROR_NO_TEAM_MATCH).getMessage(ChatUtil.getLocale(sender)));
         }
         for (Player player : Bukkit.getOnlinePlayers()) {
             Optional<TeamModule> team = Teams.getTeamByPlayer(player);
-            if (team.isPresent() && team.get().getName().startsWith(msg)) {
+            if (team.isPresent() && team.get().getName().toLowerCase().startsWith(msg)) {
                 if (!player.isWhitelisted()) {
                     player.setWhitelisted(true);
                     count++;
