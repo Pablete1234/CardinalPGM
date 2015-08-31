@@ -36,7 +36,7 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 public class ScoreboardModule implements Module {
@@ -197,19 +197,10 @@ public class ScoreboardModule implements Module {
                 }
             }
             if (ScoreModule.matchHasScoring()) {
-                for (ScoreModule score : GameHandler.getGameHandler().getMatch().getModules().getModules(ScoreModule.class)) {
-                    renderTeamScore(score);
-                }
-            }
-            if (ScoreModule.matchHasMax()) {
-                setScore(objective, ChatColor.RED + "---- MAX ----", ScoreModule.max());
+                renderTeamScore();
             }
             if (Blitz.matchIsBlitz()) {
-                for (TeamModule team : Teams.getTeams()) {
-                    if (!team.isObserver()) {
-                        renderTeamBlitz(team);
-                    }
-                }
+                renderTeamBlitz();
             }
             if (Scoreboards.getHills().size() > 0) {
                 if (!((getSpecificObjective() != null && getSpecificObjective().equals(HillObjective.class)) && !ScoreModule.matchHasScoring())) {
@@ -465,44 +456,78 @@ public class ScoreboardModule implements Module {
         currentScore++;
     }
 
-    public void renderTeamScore(ScoreModule score) {
-        TeamModule teamModule = score.getTeam();
-        Team team = scoreboard.getTeam(teamModule.getId() + "-s");
-        String fullName = score.getScore() + " " + teamModule.getCompleteName();
-        team.setPrefix(fullName.substring(0, 16));
-        team.setSuffix(fullName.substring(16, 32));
-        if (team.getEntries().size() > 0) {
-            setScore(objective, new ArrayList<>(team.getEntries()).get(0), currentScore);
-        } else {
-            String name = teamModule.getColor() + "";
-            while (used.contains(name)) {
-                name = teamModule.getColor() + name;
+    public void renderTeamScore() {
+        List<String> fullNames = new ArrayList<>();
+        for (ScoreModule score : GameHandler.getGameHandler().getMatch().getModules().getModules(ScoreModule.class)){
+            if (score.getMax() != 0){
+                fullNames.add(score.getScore() + "" + ChatColor.DARK_GRAY + "/" + ChatColor.GRAY + score.getMax() + " " + score.getTeam().getCompleteName());
+            } else {
+                fullNames.add(score.getScore() + " " + score.getTeam().getCompleteName());
             }
-            team.addEntry(name);
-            setScore(objective, name, currentScore);
-            used.add(name);
         }
-        currentScore++;
+        java.util.Collections.sort(fullNames, new Comparator<String>(){
+            public int compare(String str1, String str2){
+                String[] split1 = (str1.contains("/") ? str1.split("\u00a7",2) : str1.split(" ",2));
+                String[] split2 = (str2.contains("/") ? str2.split("\u00a7",2) : str2.split(" ",2));
+                int int1 = Integer.parseInt(split1[0]);
+                int int2 = Integer.parseInt(split2[0]);
+                return int1 - int2;
+                // -1 = str1 < str2
+                // 0 = str1 = str2
+                // 1 = str1 > str2
+            }
+        });
+        for (int i = 0; i < fullNames.size(); i++) {
+            Bukkit.getServer().getConsoleSender().sendMessage(i + ": " + fullNames.get(i));
+        }
+        for (int i = 0; i < fullNames.size(); i++) {
+            String teamCompleteName[] = fullNames.get(i).split(" ",2);
+            String teamName = teamCompleteName[1].substring(2);
+            Team team = scoreboard.getTeam(Teams.getTeamByName(teamName).get().getId() + "-s");
+            team.setPrefix(Strings.trimTo(fullNames.get(i), 0, 16));
+            team.setSuffix(Strings.trimTo(fullNames.get(i), 16, 32));
+            if (team.getEntries().size() > 0) {
+                setScore(objective, new ArrayList<>(team.getEntries()).get(0), currentScore);
+            } else {
+                String name = Teams.getTeamByName(teamName).get().getColor() + "";
+                while (used.contains(name)) {
+                    name = Teams.getTeamByName(teamName).get().getColor() + name;
+                }
+                team.addEntry(name);
+                setScore(objective, name, currentScore);
+                used.add(name);
+            }
+            currentScore++;
+        }
     }
 
-    public void renderTeamBlitz(TeamModule teamModule) {
-        Team team = scoreboard.getTeam(teamModule.getId() + "-b");
-        String fullName = teamModule.size() + " " + teamModule.getCompleteName();
-        team.setPrefix(fullName.substring(0, 16));
-        team.setSuffix(fullName.substring(16, 32));
-        if (team.getEntries().size() > 0) {
-            String entry = new ArrayList<>(team.getEntries()).get(0);
-            setScore(objective, entry, scoreboard.getObjective("scoreboard").getScore(entry).getScore());
-        } else {
-            String name = teamModule.getColor() + "";
-            while (used.contains(name)) {
-                name = teamModule.getColor() + name;
+    public void renderTeamBlitz() {
+        List<String> fullNames = new ArrayList<>();
+        for (TeamModule team : Teams.getTeams()) {
+            if (!team.isObserver()) {
+                fullNames.add(team.size() + " " + team.getCompleteName());
             }
-            team.addEntry(name);
-            setScore(objective, name, currentScore);
-            used.add(name);
         }
-        currentScore++;
+        java.util.Collections.sort(fullNames);
+        for (int i = 0; i < fullNames.size(); i++) {
+            String teamCompleteName[] = fullNames.get(i).split(" ",2);
+            String teamName = teamCompleteName[1].substring(2);
+            Team team = scoreboard.getTeam(Teams.getTeamByName(teamName).get().getId() + "-b");
+            team.setPrefix(Strings.trimTo(fullNames.get(i), 0, 16));
+            team.setSuffix(Strings.trimTo(fullNames.get(i), 16, 32));
+            if (team.getEntries().size() > 0) {
+                setScore(objective, new ArrayList<>(team.getEntries()).get(0), currentScore);
+            } else {
+                String name = Teams.getTeamByName(teamName).get().getColor() + "";
+                while (used.contains(name)) {
+                    name = Teams.getTeamByName(teamName).get().getColor() + name;
+                }
+                team.addEntry(name);
+                setScore(objective, name, currentScore);
+                used.add(name);
+            }
+            currentScore++;
+        }
     }
 
 }
