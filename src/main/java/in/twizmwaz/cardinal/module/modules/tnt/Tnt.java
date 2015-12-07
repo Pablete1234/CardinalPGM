@@ -15,8 +15,6 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.List;
 
 public class Tnt implements Module {
 
