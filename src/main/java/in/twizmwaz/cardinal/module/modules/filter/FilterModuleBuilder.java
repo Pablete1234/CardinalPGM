@@ -123,6 +123,10 @@ public class FilterModuleBuilder implements ModuleBuilder {
                     }
                 } else {
                     switch (element.getAttributeValue("name").toLowerCase()) {
+                        case "always":
+                            return new AllEventFilter("always", true);
+                        case "never":
+                            return new AllEventFilter("never", false);
                         case "allow-all":
                             return new AllEventFilter("allow-all", true);
                         case "deny-all":
