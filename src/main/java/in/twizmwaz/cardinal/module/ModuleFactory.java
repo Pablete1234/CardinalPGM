@@ -19,6 +19,7 @@ import in.twizmwaz.cardinal.module.modules.destroyable.DestroyableObjectiveBuild
 import in.twizmwaz.cardinal.module.modules.difficulty.MapDifficultyBuilder;
 import in.twizmwaz.cardinal.module.modules.disableDamage.DisableDamageBuilder;
 import in.twizmwaz.cardinal.module.modules.doubleKillPatch.DoubleKillPatchBuilder;
+import in.twizmwaz.cardinal.module.modules.fancyTab.FancyTabModuleBuilder;
 import in.twizmwaz.cardinal.module.modules.filter.FilterModuleBuilder;
 import in.twizmwaz.cardinal.module.modules.friendlyFire.FriendlyFireBuilder;
 import in.twizmwaz.cardinal.module.modules.gameComplete.GameCompleteBuilder;
@@ -164,7 +165,8 @@ public class ModuleFactory {
             ItemDropBuilder.class,
             GuiKeepModuleBuilder.class,
             RankModuleBuilder.class,
-            MultitradeBuilder.class
+            MultitradeBuilder.class,
+            FancyTabModuleBuilder.class
     };
     private final List<ModuleBuilder> builders;
 
