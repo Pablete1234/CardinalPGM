@@ -2,6 +2,7 @@ package in.twizmwaz.cardinal.cycle;
 
 import in.twizmwaz.cardinal.GameHandler;
 import in.twizmwaz.cardinal.rotation.LoadedMap;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 
@@ -38,8 +39,15 @@ public class Cycle implements Runnable {
 
     @Override
     public void run() {
+        Long time = System.currentTimeMillis();
+        Bukkit.getConsoleSender().sendMessage("Start copy from repo");
         GenerateMap.copyWorldFromRepository(map.getFolder(), uuid);
-        World world = new WorldCreator("matches/" + uuid.toString()).generator(new NullChunkGenerator()).createWorld();
+        Bukkit.getConsoleSender().sendMessage("Copied file:" + (System.currentTimeMillis() - time));
+        time = System.currentTimeMillis();
+        WorldCreator creator = new WorldCreator("matches/" + uuid.toString()).generator(new NullChunkGenerator()).environment(World.Environment.NORMAL);
+        World world = Bukkit.getServer().createWorld(creator);
+        //World world = new WorldCreator("matches/" + uuid.toString()).generator(new NullChunkGenerator()).createWorld();
+        Bukkit.getConsoleSender().sendMessage("Created World in:" + (System.currentTimeMillis() - time));
         world.setPVP(true);
         handler.setMatchWorld(world);
         handler.setMatchFile(new File("matches/" + uuid.toString() + "/"));
