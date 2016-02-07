@@ -335,6 +335,7 @@ public class Cardinal extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new BossBars(), this);
         try {
             gameHandler = new GameHandler();
+            Bukkit.getPluginManager().registerEvents(gameHandler, this);
         } catch (RotationLoadException e) {
             e.printStackTrace();
             getLogger().severe(new LocalizedChatMessage(ChatConstant.GENERIC_REPO_RELOAD_FAIL, "" + GameHandler.getGameHandler().getRotation().getLoaded().size()).getMessage(Locale.getDefault().toString()));
