@@ -49,6 +49,8 @@ import in.twizmwaz.cardinal.module.modules.mob.MobModuleBuilder;
 import in.twizmwaz.cardinal.module.modules.monumentModes.MonumentModesBuilder;
 import in.twizmwaz.cardinal.module.modules.motd.MOTDBuilder;
 import in.twizmwaz.cardinal.module.modules.multitrade.MultitradeBuilder;
+import in.twizmwaz.cardinal.module.modules.payload.PayloadBuilder;
+import in.twizmwaz.cardinal.module.modules.spectatorTools.SpectatorToolsBuilder;
 import in.twizmwaz.cardinal.module.modules.observers.ObserverModuleBuilder;
 import in.twizmwaz.cardinal.module.modules.permissions.PermissionModuleBuilder;
 import in.twizmwaz.cardinal.module.modules.playable.PlayableBuilder;
@@ -67,7 +69,6 @@ import in.twizmwaz.cardinal.module.modules.scorebox.ScoreboxBuilder;
 import in.twizmwaz.cardinal.module.modules.snowflakes.SnowflakesBuilder;
 import in.twizmwaz.cardinal.module.modules.sound.SoundModuleBuilder;
 import in.twizmwaz.cardinal.module.modules.spawn.SpawnModuleBuilder;
-import in.twizmwaz.cardinal.module.modules.spectatorTools.SpectatorToolsBuilder;
 import in.twizmwaz.cardinal.module.modules.stats.StatsBuilder;
 import in.twizmwaz.cardinal.module.modules.tasker.TaskerModuleBuilder;
 import in.twizmwaz.cardinal.module.modules.team.TeamModuleBuilder;
@@ -193,7 +194,8 @@ public class ModuleFactory {
                 FallingBlocksBuilder.class,
                 SpectatorToolsBuilder.class,
                 ProjectileParticlesModuleBuilder.class,
-                FeedbackModuleBuilder.class
+                FeedbackModuleBuilder.class,
+                PayloadBuilder.class
         );
     }
 
