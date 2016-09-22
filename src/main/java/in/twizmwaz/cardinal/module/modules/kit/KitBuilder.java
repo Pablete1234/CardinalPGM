@@ -19,11 +19,13 @@ import in.twizmwaz.cardinal.module.modules.kit.kitTypes.KitArmor;
 import in.twizmwaz.cardinal.module.modules.kit.kitTypes.KitItem;
 import in.twizmwaz.cardinal.module.modules.kit.kitTypes.KnockbackReductionKit;
 import in.twizmwaz.cardinal.module.modules.kit.kitTypes.PotionKit;
+import in.twizmwaz.cardinal.module.modules.kit.kitTypes.TeamKit;
 import in.twizmwaz.cardinal.module.modules.kit.kitTypes.WalkSpeedKit;
 import in.twizmwaz.cardinal.util.ArmorType;
 import in.twizmwaz.cardinal.util.Numbers;
 import in.twizmwaz.cardinal.util.Parser;
 import in.twizmwaz.cardinal.util.Strings;
+import in.twizmwaz.cardinal.util.Teams;
 import org.bukkit.GameMode;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.inventory.ItemStack;
@@ -136,6 +138,8 @@ public class KitBuilder implements ModuleBuilder {
                 float flySpeed = Float.parseFloat(jump.getAttributeValue("fly-speed", "1")) / 10F;
                 kits.add(new FlyKit(canFly, flying, flySpeed));
             }
+
+            if (element.getChildText("team-change") != null) kits.add(new TeamKit(Teams.getTeamById(element.getChildText("team-change")).orNull()));
 
             String filter = element.getAttributeValue("filter", "always");
             String parent = element.getAttributeValue("parents", "");
