@@ -12,7 +12,10 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.Comparator;
 import java.util.Locale;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 public class ChatUtil {
 
@@ -68,6 +71,22 @@ public class ChatUtil {
         } else {
             return ChatColor.GREEN;
         }
+    }
+
+    public static <T> Stream<String> paginate(Stream<T> stream, Comparator<? super T> comparator, int pageSize, int index, Function<T, String> toString) {
+        return new Paginator().paginate(stream, comparator, pageSize, index, toString);
+    }
+
+    private static class Paginator {
+
+        private int current;
+
+        private <T> Stream<String> paginate(Stream<T> stream, Comparator<? super T> comparator, int pageSize, int index, Function<T, String> toString) {
+            current = pageSize * (index - 1);
+            stream = comparator == null ? stream : stream.sorted(comparator);
+            return stream.skip(current).limit(pageSize).map(toString).map(str -> str.replace("${index}", ++current + ""));
+        }
+
     }
 
 }

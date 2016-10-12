@@ -6,7 +6,7 @@ import in.twizmwaz.cardinal.chat.LocalizedChatMessage;
 import in.twizmwaz.cardinal.chat.UnlocalizedChatMessage;
 import in.twizmwaz.cardinal.event.CycleCompleteEvent;
 import in.twizmwaz.cardinal.module.TaskedModule;
-import in.twizmwaz.cardinal.rotation.LoadedMap;
+import in.twizmwaz.cardinal.repository.LoadedMap;
 import in.twizmwaz.cardinal.util.Contributor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;

@@ -39,7 +39,8 @@ import in.twizmwaz.cardinal.command.TeleportCommands;
 import in.twizmwaz.cardinal.command.TimeLimitCommand;
 import in.twizmwaz.cardinal.command.WhitelistCommands;
 import in.twizmwaz.cardinal.rank.Rank;
-import in.twizmwaz.cardinal.rotation.exception.RotationLoadException;
+import in.twizmwaz.cardinal.repository.RepositoryManager;
+import in.twizmwaz.cardinal.repository.exception.RotationLoadException;
 import in.twizmwaz.cardinal.settings.Setting;
 import in.twizmwaz.cardinal.settings.SettingValue;
 import in.twizmwaz.cardinal.tabList.TabList;
@@ -66,6 +67,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -345,7 +347,7 @@ public class Cardinal extends JavaPlugin {
             gameHandler.load();
         } catch (RotationLoadException e) {
             e.printStackTrace();
-            getLogger().severe(new LocalizedChatMessage(ChatConstant.GENERIC_REPO_RELOAD_FAIL, "" + GameHandler.getGameHandler().getRotation().getLoaded().size()).getMessage(Locale.getDefault().toString()));
+            getLogger().severe(new LocalizedChatMessage(ChatConstant.GENERIC_REPO_RELOAD_FAIL, "" + RepositoryManager.get().getMapSize()).getMessage(Locale.getDefault().toString()));
             setEnabled(false);
             return;
         }
@@ -367,6 +369,14 @@ public class Cardinal extends JavaPlugin {
 
     public JavaPlugin getPlugin() {
         return this;
+    }
+
+    public static String getNewRepoPath(String repoName) {
+        String reposPath = Cardinal.getInstance().getDataFolder().getAbsolutePath() +
+                File.separator + "repositories" + File.separator + repoName;
+        File repo = new File(reposPath);
+        if (!repo.exists()) repo.mkdirs();
+        return reposPath;
     }
 
 }

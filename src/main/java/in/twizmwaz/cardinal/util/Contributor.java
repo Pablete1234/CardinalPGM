@@ -54,4 +54,5 @@ public class Contributor {
     public UUID getUniqueId() {
         return uniqueId;
     }
+
 }

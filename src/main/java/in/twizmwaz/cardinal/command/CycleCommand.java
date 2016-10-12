@@ -10,38 +10,39 @@ import in.twizmwaz.cardinal.chat.LocalizedChatMessage;
 import in.twizmwaz.cardinal.match.MatchState;
 import in.twizmwaz.cardinal.module.modules.cycleTimer.CycleTimerModule;
 import in.twizmwaz.cardinal.module.modules.timeLimit.TimeLimit;
-import in.twizmwaz.cardinal.rotation.LoadedMap;
+import in.twizmwaz.cardinal.repository.LoadedMap;
+import in.twizmwaz.cardinal.repository.RepositoryManager;
 import in.twizmwaz.cardinal.util.ChatUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 public class CycleCommand {
 
-    @Command(aliases = {"cycle"}, desc = "Cycles the world and loads a new world.", usage = "[time] [map]", flags = "fn")
+    @Command(aliases = {"cycle"}, desc = "Cycles the world and loads a new world.", usage = "[time] [map]", flags = "fnm:")
     @CommandPermissions("cardinal.match.cycle")
     public static void cycle(final CommandContext cmd, CommandSender sender) throws CommandException {
         if (GameHandler.getGameHandler().getMatch().getState().equals(MatchState.STARTING)) {
             throw new CommandException(ChatConstant.ERROR_CYCLE_DURING_MATCH.getMessage(ChatUtil.getLocale(sender)));
         }
         processCycle(cmd, sender);
-        if (cmd.argsLength() > 1) {
-            LoadedMap next = getMap(cmd.getJoinedStrings(1).replace(" -f", "").replace("-f ", ""));
-            if (next == null) {
-                throw new CommandException(new LocalizedChatMessage(ChatConstant.ERROR_NO_MAP_MATCH).getMessage(ChatUtil.getLocale(sender)));
-            } else {
-                setCycleMap(next);
-            }
-        }
+        LoadedMap map = cmd.hasFlag('m') ? GameHandler.getGameHandler().getRepositoryManager().getMap(Integer.parseInt(cmd.getFlag('m'))) :
+                cmd.argsLength() > 1 ? getMap(cmd.getJoinedStrings(1).replace(" -f", "").replace("-f ", "")) :
+                        GameHandler.getGameHandler().getCycle().getMap();
+        if (map == null)
+            throw new CommandException(new LocalizedChatMessage(ChatConstant.ERROR_NO_MAP_MATCH).getMessage(ChatUtil.getLocale(sender)));
+        else setCycleMap(map);
         CycleTimerModule timer = GameHandler.getGameHandler().getMatch().getModules().getModule(CycleTimerModule.class);
         timer.setOriginalState(GameHandler.getGameHandler().getMatch().getState());
         timer.setCancelled(true);
         timer.cycleTimer(cmd.argsLength() > 0 ? cmd.getInteger(0) : 30);
     }
 
-    @Command(aliases = {"setnext", "sn"}, desc = "Sets the next map.", usage = "[map]", min = 1)
+    @Command(aliases = {"setnext", "sn"}, desc = "Sets the next map.", usage = "[map]", flags = "m:")
     @CommandPermissions("cardinal.match.setnext")
     public static void setNext(final CommandContext cmd, CommandSender sender) throws CommandException {
-        LoadedMap nextMap = getMap(cmd.getJoinedStrings(0));
+        LoadedMap nextMap =
+                cmd.hasFlag('m') ? GameHandler.getGameHandler().getRepositoryManager().getMap(Integer.parseInt(cmd.getFlag('m'))) :
+                        cmd.argsLength() > 0 ? GameHandler.getGameHandler().getRepositoryManager().getMap(cmd.getJoinedStrings(0)) : null;
         if (nextMap == null) {
             throw new CommandException(ChatConstant.ERROR_NO_MAP_MATCH.getMessage(ChatUtil.getLocale(sender)));
         }
@@ -49,7 +50,7 @@ public class CycleCommand {
         sender.sendMessage(ChatColor.DARK_PURPLE + new LocalizedChatMessage(ChatConstant.GENERIC_MAP_SET, ChatColor.GOLD + nextMap.getName() + ChatColor.DARK_PURPLE).getMessage(ChatUtil.getLocale(sender)));
     }
 
-    @Command(aliases = {"recycle", "rc"}, desc = "Cycles to the current map.", usage = "[time]", flags = "f")
+    @Command(aliases = {"recycle", "rc"}, desc = "Cycles to the current map.", usage = "[time]", flags = "fn")
     @CommandPermissions("cardinal.match.cycle")
     public static void recycle(final CommandContext cmd, CommandSender sender) throws CommandException {
         if (GameHandler.getGameHandler().getMatch().getState().equals(MatchState.STARTING)) {
@@ -64,21 +65,11 @@ public class CycleCommand {
     }
 
     private static LoadedMap getMap(String input) {
-        input = input.toLowerCase().replaceAll(" ", "");
-        LoadedMap result = null;
-        for (LoadedMap loadedMap : GameHandler.getGameHandler().getRotation().getLoaded()) {
-            if (loadedMap.getName().toLowerCase().replaceAll(" ", "").equalsIgnoreCase(input.toLowerCase())) {
-                result = loadedMap;
-            }
-        }
-        if (result == null) {
-            for (LoadedMap loadedMap : GameHandler.getGameHandler().getRotation().getLoaded()) {
-                if (loadedMap.getName().toLowerCase().replaceAll(" ", "").startsWith(input.toLowerCase())) {
-                    result = loadedMap;
-                }
-            }
-        }
-        return result;
+        final String search = input.toLowerCase().replaceAll(" ", "");
+        return RepositoryManager.get().getLoadedStream().filter(
+                map -> map.getName().replaceAll(" ", "").equalsIgnoreCase(search)).findFirst().orElseGet(
+                () -> RepositoryManager.get().getLoadedStream().filter(
+                map -> map.getName().toLowerCase().replaceAll(" ", "").startsWith(search)).findFirst().orElse(null));
     }
 
     private static void setCycleMap(LoadedMap map) {

@@ -11,7 +11,7 @@ import in.twizmwaz.cardinal.event.PlayerNameUpdateEvent;
 import in.twizmwaz.cardinal.event.RankChangeEvent;
 import in.twizmwaz.cardinal.module.TaskedModule;
 import in.twizmwaz.cardinal.module.modules.matchTimer.MatchTimer;
-import in.twizmwaz.cardinal.rotation.LoadedMap;
+import in.twizmwaz.cardinal.repository.LoadedMap;
 import in.twizmwaz.cardinal.util.Config;
 import in.twizmwaz.cardinal.util.Contributor;
 import in.twizmwaz.cardinal.util.Strings;
@@ -48,53 +48,46 @@ public class HeaderModule implements TaskedModule {
 
     @Override
     public void run() {
-        if (GameHandler.getGameHandler().getMatch().isRunning() && last != (int)MatchTimer.getTimeInSeconds()) {
-            last = (int)MatchTimer.getTimeInSeconds();
-            updateFooter();
-            updateAll();
+        if (GameHandler.getGameHandler().getMatch().isRunning() && last != (int) MatchTimer.getTimeInSeconds()) {
+            last = (int) MatchTimer.getTimeInSeconds();
+            updateAll(HeaderPart.FOOTER);
         }
     }
 
     @EventHandler
     public void onCycleComplete(CycleCompleteEvent event) {
-        updateAll();
+        updateAll(HeaderPart.BOTH);
     }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-        updateHeader();
-        updateAll();
+        updateAll(HeaderPart.HEADER);
     }
 
     @EventHandler
     public void onPlayerNameChange(PlayerNameUpdateEvent event) {
-        updateHeader();
-        updateAll();
+        updateAll(HeaderPart.HEADER);
     }
 
     @EventHandler
     public void onRankChange(RankChangeEvent event) {
-        if (event.isOnline()) return;
-        updateHeader();
-        updateAll();
+        updateAll(HeaderPart.HEADER);
     }
 
     @EventHandler
-    public void onMatchStart (MatchStartEvent event) {
+    public void onMatchStart(MatchStartEvent event) {
         last = 0;
-        updateFooter();
-        updateAll();
+        updateAll(HeaderPart.FOOTER);
     }
 
     @EventHandler
     public void onMatchEnd(MatchEndEvent event) {
-        updateFooter();
-        updateAll();
+        updateAll(HeaderPart.FOOTER);
     }
 
     @EventHandler
     public void onLangChange(PlayerLocaleChangeEvent event) {
-        updatePlayer(event.getPlayer(), event.getNewLocale());
+        updatePlayer(event.getPlayer(), event.getNewLocale(), HeaderPart.NONE);
     }
 
     public void updateHeader() {
@@ -109,15 +102,15 @@ public class HeaderModule implements TaskedModule {
                 ChatColor.WHITE + ChatColor.BOLD + "Cardinal", ChatConstant.UI_TIME.asMessage());
     }
 
-    public void updateAll() {
+    public void updateAll(HeaderPart part) {
         for (Player player : Bukkit.getOnlinePlayers()) {
-            updatePlayer(player, player.getLocale());
+            updatePlayer(player, player.getLocale(), part);
         }
     }
 
-    private void updatePlayer(Player player, String locale) {
-        if (header == null) updateHeader();
-        if (footer == null) updateFooter();
+    private void updatePlayer(Player player, String locale, HeaderPart part) {
+        if (header == null || part.equals(HeaderPart.HEADER) || part.equals(HeaderPart.BOTH)) updateHeader();
+        if (footer == null || part.equals(HeaderPart.FOOTER) || part.equals(HeaderPart.BOTH)) updateFooter();
         player.setPlayerListHeaderFooter(new TextComponent(header.getMessage(locale)), new TextComponent(footer.getMessage(locale)));
     }
 
@@ -136,6 +129,13 @@ public class HeaderModule implements TaskedModule {
             }
         }
         return new UnlocalizedChatMessage(builder.toString(), ChatConstant.MISC_AND.asMessage());
+    }
+
+    public enum HeaderPart {
+        NONE,
+        HEADER,
+        FOOTER,
+        BOTH;
     }
 
 }

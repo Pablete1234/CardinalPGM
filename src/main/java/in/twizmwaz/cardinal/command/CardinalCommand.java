@@ -10,7 +10,9 @@ import in.twizmwaz.cardinal.UpdateHandler;
 import in.twizmwaz.cardinal.chat.ChatConstant;
 import in.twizmwaz.cardinal.chat.LocalizedChatMessage;
 import in.twizmwaz.cardinal.chat.UnlocalizedChatMessage;
-import in.twizmwaz.cardinal.rotation.exception.RotationLoadException;
+import in.twizmwaz.cardinal.repository.RepositoryManager;
+import in.twizmwaz.cardinal.repository.exception.RotationLoadException;
+import in.twizmwaz.cardinal.util.AsyncCommand;
 import in.twizmwaz.cardinal.util.ChatUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -53,16 +55,21 @@ public class CardinalCommand {
     @Command(aliases = "newmaps", desc = "Reload map repository.")
     @CommandPermissions("cardinal.newmaps")
     public static void newMaps(final CommandContext cmd, CommandSender sender) {
-        try {
-            GameHandler.getGameHandler().getRotation().setupRotation();
-            sender.sendMessage(new UnlocalizedChatMessage(ChatColor.GREEN + "{0}", new LocalizedChatMessage(ChatConstant.GENERIC_REPO_RELOAD,
-                    "" + GameHandler.getGameHandler().getRotation().getLoaded().size())).getMessage(sender instanceof Player ? ((Player) sender).getLocale() : Locale.getDefault().toString()));
-        } catch (RotationLoadException e) {
-            e.printStackTrace();
-            Bukkit.getLogger().severe(new LocalizedChatMessage(ChatConstant.GENERIC_REPO_RELOAD_FAIL, "" + GameHandler.getGameHandler().getRotation().getLoaded().size()).getMessage(Locale.getDefault().toString()));
-            sender.sendMessage(new UnlocalizedChatMessage(ChatColor.RED + "{0}", new LocalizedChatMessage(ChatConstant.GENERIC_REPO_RELOAD_FAIL,
-                    "" + GameHandler.getGameHandler().getRotation().getLoaded().size())).getMessage(sender instanceof Player ? ((Player) sender).getLocale() : Locale.getDefault().toString()));
-        }
+        Bukkit.getScheduler().runTaskAsynchronously(Cardinal.getInstance(), new AsyncCommand(cmd, sender) {
+            @Override
+            public void run() {
+                try {
+                    GameHandler.getGameHandler().getRepositoryManager().setupRotation();
+                    sender.sendMessage(new UnlocalizedChatMessage(ChatColor.GREEN + "{0}", new LocalizedChatMessage(ChatConstant.GENERIC_REPO_RELOAD,
+                            "" + RepositoryManager.get().getMapSize())).getMessage(sender instanceof Player ? ((Player) sender).getLocale() : Locale.getDefault().toString()));
+                } catch (RotationLoadException e) {
+                    e.printStackTrace();
+                    Bukkit.getLogger().severe(new LocalizedChatMessage(ChatConstant.GENERIC_REPO_RELOAD_FAIL, "" + RepositoryManager.get().getMapSize()).getMessage(Locale.getDefault().toString()));
+                    sender.sendMessage(new UnlocalizedChatMessage(ChatColor.RED + "{0}", new LocalizedChatMessage(ChatConstant.GENERIC_REPO_RELOAD_FAIL,
+                            "" + RepositoryManager.get().getMapSize())).getMessage(sender instanceof Player ? ((Player) sender).getLocale() : Locale.getDefault().toString()));
+                }
+            }
+        });
     }
 
 }

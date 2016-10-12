@@ -1,24 +1,36 @@
-package in.twizmwaz.cardinal.rotation;
+package in.twizmwaz.cardinal.repository;
 
+import in.twizmwaz.cardinal.module.BuilderData;
 import in.twizmwaz.cardinal.util.Contributor;
+import org.bukkit.Bukkit;
 
 import java.io.File;
 import java.util.List;
 
 public class LoadedMap {
 
-    private final String name, version, objective;
-    private final List<Contributor> authors, contributors;
-    private final List<String> rules;
-    private final int maxPlayers;
+    private String name, version, objective;
+    private List<Contributor> authors, contributors;
+    private List<String> rules;
+    private int maxPlayers;
     private final File folder;
+    private int id = -1;
+
+    private static int maxNum = 0;
 
     /**
      * @param name    The name of the map
      * @param authors The authors of the map
      * @param folder  The folder where the map can be found
      */
-    public LoadedMap(String name, String version, String objective, List<Contributor> authors, List<Contributor> contributors, List<String> rules, int maxPlayers, File folder) {
+    public LoadedMap(String name, String version, String objective, List<Contributor> authors,
+                         List<Contributor> contributors, List<String> rules, int maxPlayers, File folder) {
+        this.folder = folder;
+        update(name, version, objective, authors, contributors, rules, maxPlayers);
+    }
+
+    private void update(String name, String version, String objective, List<Contributor> authors,
+                        List<Contributor> contributors, List<String> rules, int maxPlayers) {
         this.name = name;
         this.version = version;
         this.objective = objective;
@@ -26,7 +38,20 @@ public class LoadedMap {
         this.contributors = contributors;
         this.rules = rules;
         this.maxPlayers = maxPlayers;
-        this.folder = folder;
+    }
+
+    public void update(LoadedMap map) {
+        update(map.name, map.version, map.objective, map.authors, map.contributors, map.rules, map.maxPlayers);
+    }
+
+    public void load() {
+        if (this.id == -1) {
+            this.id = maxNum++;
+        }
+    }
+
+    public int getId() {
+        return id;
     }
 
     /**
@@ -84,4 +109,10 @@ public class LoadedMap {
     public File getFolder() {
         return folder;
     }
+
+    @Override
+    public boolean equals(Object other) {
+        return other instanceof LoadedMap && folder.equals(((LoadedMap) other).folder);
+    }
+
 }
