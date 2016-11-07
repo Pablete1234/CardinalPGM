@@ -1,11 +1,16 @@
 package in.twizmwaz.cardinal.repository;
 
-import in.twizmwaz.cardinal.module.BuilderData;
+import in.twizmwaz.cardinal.chat.ChatConstant;
+import in.twizmwaz.cardinal.chat.ChatMessage;
+import in.twizmwaz.cardinal.chat.LocalizedChatMessage;
+import in.twizmwaz.cardinal.chat.UnlocalizedChatMessage;
+import in.twizmwaz.cardinal.util.ChatUtil;
 import in.twizmwaz.cardinal.util.Contributor;
-import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 
 import java.io.File;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class LoadedMap {
 
@@ -16,7 +21,7 @@ public class LoadedMap {
     private final File folder;
     private int id = -1;
 
-    private static int maxNum = 0;
+    private static int maxId = 0;
 
     /**
      * @param name    The name of the map
@@ -45,9 +50,7 @@ public class LoadedMap {
     }
 
     public void load() {
-        if (this.id == -1) {
-            this.id = maxNum++;
-        }
+        if (id == -1) id = maxId++;
     }
 
     public int getId() {
@@ -113,6 +116,17 @@ public class LoadedMap {
     @Override
     public boolean equals(Object other) {
         return other instanceof LoadedMap && folder.equals(((LoadedMap) other).folder);
+    }
+
+    public ChatMessage toChatMessage() {
+        return new LocalizedChatMessage(ChatConstant.MISC_BY,
+                new UnlocalizedChatMessage(ChatColor.GOLD + getName() + ChatColor.DARK_PURPLE),
+                ChatUtil.toChatMessage(getAuthors().stream()
+                        .map(Contributor::getName).collect(Collectors.toList())));
+    }
+
+    public ChatMessage toIndexedMessage() {
+        return new UnlocalizedChatMessage("${index}. " + toChatMessage());
     }
 
 }

@@ -1,5 +1,8 @@
 package in.twizmwaz.cardinal.util;
 
+import in.twizmwaz.cardinal.chat.ChatConstant;
+import in.twizmwaz.cardinal.chat.ChatMessage;
+import in.twizmwaz.cardinal.chat.LocalizedChatMessage;
 import org.bukkit.ChatColor;
 import org.bukkit.util.ChatPaginator;
 
@@ -122,10 +125,32 @@ public class Strings {
         return new String(new char[n]).replace("\0", c);
     }
 
-    public static String padMessage(String message, String c, ChatColor dashColor, ChatColor messageColor) {
+    public static String padMessage(String message) {
+        return padMessage(message, ChatColor.BLUE);
+    }
+
+    public static String padMessage(String message, ChatColor dashColor) {
+        return padMessage(message, dashColor, ChatPaginator.GUARANTEED_NO_WRAP_CHAT_PAGE_WIDTH);
+    }
+
+    public static String padMessage(String message, ChatColor dashColor, int maxLen) {
+        return padMessage(message, dashColor, "-", maxLen);
+    }
+
+    public static String padMessage(String message, ChatColor dashColor, String c, int maxLen) {
         message = " " + message + " ";
-        String dashes = Strings.repeat(c, (ChatPaginator.GUARANTEED_NO_WRAP_CHAT_PAGE_WIDTH - ChatColor.stripColor(message).length() - 2) / (c.length() * 2));
-        return dashColor + dashes + ChatColor.RESET + messageColor + message + ChatColor.RESET + dashColor + dashes;
+        String dashes = ChatColor.STRIKETHROUGH +
+                Strings.repeat(c, (maxLen - ChatColor.stripColor(message).length() - 2) / (c.length() * 2));
+        return dashColor + dashes + ChatColor.RESET + message + ChatColor.RESET + dashColor + dashes;
+    }
+
+    public static ChatMessage page(int index, int max) {
+        return page(index, max, ChatColor.DARK_AQUA, ChatColor.AQUA);
+    }
+
+    public static ChatMessage page(int index, int max, ChatColor chatColor, ChatColor numColor) {
+        return new LocalizedChatMessage(ChatConstant.UI_OF,
+                chatColor + "(" + numColor + index + chatColor, "" + numColor + max + chatColor + ")");
     }
 
     public static String trimTo(String string, int start, int end) {
@@ -162,4 +187,21 @@ public class Strings {
         }
         return color;
     }
+
+    /**
+     * Simplifies a string by making it lowercase and removing spaces.
+     * @return The string in lowercase without spaces
+     */
+    public static String simplify(String string) {
+        return string.toLowerCase().replace(" ", "");
+    }
+
+    /**
+     * Checks checks if string1 starts with string2, used for user inputs
+     * @return if string1 simplified starts win string2 simplified
+     */
+    public static boolean matchString(String string1, String string2) {
+        return simplify(string1).startsWith(simplify(string2));
+    }
+
 }

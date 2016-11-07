@@ -53,10 +53,9 @@ public class DomUtil {
     public static void include(Repository repo, Document doc, String include, File original, boolean warn) {
         File including = repo.getInclude(include);
         if (including != null)
-            if (including != original)
-                merge(repo, doc, including);
-            else if (warn)
-                Bukkit.getLogger().log(Level.WARNING, "File '" + include + "' was not found nor included!");
+            if (including != original) merge(repo, doc, including);
+        else if (warn)
+            Bukkit.getLogger().log(Level.WARNING, "File '" + include + "' was not found nor included!");
     }
 
     public static Document merge(Repository repo, Document original, File copy) {

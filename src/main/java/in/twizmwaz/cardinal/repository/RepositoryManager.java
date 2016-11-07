@@ -15,6 +15,7 @@ import in.twizmwaz.cardinal.util.CollectionUtils;
 import in.twizmwaz.cardinal.util.Config;
 import in.twizmwaz.cardinal.util.Contributor;
 import in.twizmwaz.cardinal.util.MojangUtil;
+import in.twizmwaz.cardinal.util.Strings;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
@@ -102,6 +103,10 @@ public class RepositoryManager {
         return repos.stream().flatMap(repository -> repository.getLoaded().stream());
     }
 
+    public List<Repository> getRepos() {
+        return repos;
+    }
+
     public int getMapSize() {
         return repos.stream().mapToInt(repo -> repo.getLoaded().size()).sum();
     }
@@ -114,8 +119,8 @@ public class RepositoryManager {
      * @param string The name of map to be searched for
      * @return The map
      */
-    public LoadedMap getMap(String string) {
-        return getLoadedStream().filter(map -> map.getName().toLowerCase().startsWith(string.toLowerCase())).findFirst().orElse(null);
+    public List<LoadedMap> getMap(String string) {
+        return getLoadedStream().filter(map -> Strings.matchString(map.getName(), string)).collect(Collectors.toList());
     }
 
     /**

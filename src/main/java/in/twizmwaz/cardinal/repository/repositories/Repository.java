@@ -1,7 +1,6 @@
 package in.twizmwaz.cardinal.repository.repositories;
 
 import com.google.common.collect.Lists;
-import edu.umd.cs.findbugs.ba.bcp.Load;
 import in.twizmwaz.cardinal.Cardinal;
 import in.twizmwaz.cardinal.repository.LoadedMap;
 import in.twizmwaz.cardinal.repository.exception.RotationLoadException;
@@ -27,12 +26,18 @@ import java.util.stream.Collectors;
 
 public abstract class Repository {
 
-    private String path;
+    private static final List<String> requirements = Arrays.asList("map.xml", "region", "level.dat");
 
     private List<LoadedMap> loaded = Lists.newArrayList();
     private Map<String, File> includes = new HashMap<>();
+    private String path;
+    private int id = -1;
 
-    private static List<String> requirements = Arrays.asList("map.xml", "region", "level.dat");
+    private static int maxId = 0;
+
+    public int getId() {
+        return id;
+    }
 
     public String getSource() {
         return path;
@@ -46,14 +51,12 @@ public abstract class Repository {
         return includes.containsKey(name) ? includes.get(name) : null;
     }
 
-    private static int maxId = 0;
-    public int id = maxId++;
-
     Repository(String path) throws RotationLoadException, IOException {
         this.path = path;
     }
 
     public void refreshRepo() throws RotationLoadException, IOException {
+        if (id == -1) id = maxId++;
         includes.clear();
         File repo = new File(path);
         if (!repo.exists()) repo.mkdir();

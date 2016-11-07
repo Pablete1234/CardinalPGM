@@ -8,22 +8,25 @@ import in.twizmwaz.cardinal.event.CycleCompleteEvent;
 import in.twizmwaz.cardinal.event.PlayerChangeTeamEvent;
 import in.twizmwaz.cardinal.match.Match;
 import in.twizmwaz.cardinal.module.Module;
-import in.twizmwaz.cardinal.module.modules.respawn.RespawnModule;
 import in.twizmwaz.cardinal.module.modules.team.TeamModule;
+import in.twizmwaz.cardinal.util.ChatUtil;
 import in.twizmwaz.cardinal.util.Contributor;
 import in.twizmwaz.cardinal.util.Players;
+import in.twizmwaz.cardinal.util.Strings;
 import in.twizmwaz.cardinal.util.Teams;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.util.ChatPaginator;
 
-import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 public class TeamManagerModule implements Module {
 
@@ -74,57 +77,20 @@ public class TeamManagerModule implements Module {
         }
     }
 
-    private void sendMapMessage(Player player) {
-        player.sendMessage(ChatColor.STRIKETHROUGH + "--------" + ChatColor.AQUA + ChatColor.BOLD + " " + GameHandler.getGameHandler().getMatch().getLoadedMap().getName() + " " + ChatColor.RESET + ChatColor.STRIKETHROUGH + "--------");
-        String line = "";
-        if (GameHandler.getGameHandler().getMatch().getLoadedMap().getObjective().contains(" ")) {
-            for (String word : GameHandler.getGameHandler().getMatch().getLoadedMap().getObjective().split(" ")) {
-                line += word + " ";
-                if (line.trim().length() > 32) {
-                    line = ChatColor.BLUE + "" + ChatColor.ITALIC + line.trim();
-                    player.sendMessage(" " + line);
-                    line = "";
-                }
-            }
-            if (!line.trim().equals("")) {
-                line = ChatColor.BLUE + "" + ChatColor.ITALIC + line.trim();
-                player.sendMessage(" " + line);
-                line = "";
-            }
-        } else {
-            line = ChatColor.BLUE + "" + ChatColor.ITALIC + GameHandler.getGameHandler().getMatch().getLoadedMap().getObjective();
-            player.sendMessage(" " + line);
+    private void sendMapMessage(CommandSender player) {
+        player.sendMessage(Strings.padMessage("" + ChatColor.AQUA + ChatColor.BOLD + GameHandler.getGameHandler().getMatch().getLoadedMap().getName(), ChatColor.WHITE, 32));
+        String[] lines = ChatPaginator.wordWrap("" + ChatColor.BLUE + ChatColor.ITALIC + match.getLoadedMap().getObjective(), 32);
+        for (String line : lines) {
+            player.sendMessage(" " + ChatColor.BLUE + line);
         }
-        String locale = player.getLocale();
-        String result = ChatColor.DARK_GRAY + new LocalizedChatMessage(ChatConstant.GENERIC_CREATED_BY).getMessage(locale) + " ";
-        List<Contributor> authors = GameHandler.getGameHandler().getMatch().getLoadedMap().getAuthors();
-        for (Contributor author : authors) {
-            if (authors.indexOf(author) < authors.size() - 2) {
-                result = result + author.getDisplayName() + ChatColor.DARK_GRAY + ", ";
-            } else if (authors.indexOf(author) == authors.size() - 2) {
-                result = result + author.getDisplayName() + ChatColor.DARK_GRAY + " " + new LocalizedChatMessage(ChatConstant.MISC_AND).getMessage(locale) + " ";
-            } else if (authors.indexOf(author) == authors.size() - 1) {
-                result = result + author.getDisplayName();
-            }
+        String result = ChatColor.DARK_GRAY + new LocalizedChatMessage(ChatConstant.GENERIC_CREATED_BY,
+                ChatUtil.toChatMessage(match.getLoadedMap().getAuthors().stream().map(Contributor::getDisplayName)
+                        .collect(Collectors.toList()), ChatColor.DARK_AQUA, ChatColor.DARK_GRAY)).getMessage(ChatUtil.getLocale(player));
+        lines = ChatPaginator.wordWrap(result, 40);
+        for (String line : lines) {
+            player.sendMessage(line);
         }
-        if (result.contains(" ")) {
-            for (String word : result.split(" ")) {
-                line += word + " ";
-                if (line.trim().length() > 32) {
-                    line = line.trim();
-                    player.sendMessage(ChatColor.DARK_GRAY + " " + line);
-                    line = "";
-                }
-            }
-            if (!line.trim().equals("")) {
-                line = line.trim();
-                player.sendMessage(ChatColor.DARK_GRAY + " " + line);
-            }
-        } else {
-            line = result;
-            player.sendMessage(ChatColor.DARK_GRAY + " " + line);
-        }
-        player.sendMessage(ChatColor.STRIKETHROUGH + "---------------------------");
+        player.sendMessage(ChatColor.STRIKETHROUGH + Strings.repeat("-", 40));
     }
 
     @EventHandler

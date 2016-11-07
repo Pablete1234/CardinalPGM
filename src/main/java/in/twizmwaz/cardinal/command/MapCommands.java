@@ -7,6 +7,7 @@ import in.twizmwaz.cardinal.GameHandler;
 import in.twizmwaz.cardinal.chat.ChatConstant;
 import in.twizmwaz.cardinal.chat.LocalizedChatMessage;
 import in.twizmwaz.cardinal.repository.LoadedMap;
+import in.twizmwaz.cardinal.repository.RepositoryManager;
 import in.twizmwaz.cardinal.repository.repositories.Repository;
 import in.twizmwaz.cardinal.util.ChatUtil;
 import in.twizmwaz.cardinal.util.Contributor;
@@ -15,13 +16,12 @@ import org.bukkit.command.CommandSender;
 
 public class MapCommands {
 
-    @Command(aliases = {"map", "mapinfo"}, flags = "lm:", desc = "Shows information about the currently playing map.", usage = "")
+    @Command(aliases = {"map", "mapinfo"}, flags = "lm:", desc = "Shows information about the currently playing map.")
     public static void map(final CommandContext args, CommandSender sender) throws CommandException {
         LoadedMap mapInfo =
-                args.hasFlag('m') ? GameHandler.getGameHandler().getRepositoryManager().getMap(Integer.parseInt(args.getFlag('m'))) :
+                args.hasFlag('m') ? RepositoryManager.get().getMap(Integer.parseInt(args.getFlag('m'))) :
                         args.argsLength() == 0 ? GameHandler.getGameHandler().getMatch().getLoadedMap() :
-                                GameHandler.getGameHandler().getRepositoryManager().getMap(args.getJoinedStrings(0));
-
+                                CycleCommand.getMap(sender, args.getJoinedStrings(0));
         if (mapInfo == null) {
             throw new CommandException(ChatConstant.ERROR_NO_MAP_MATCH.getMessage(ChatUtil.getLocale(sender)));
         }
@@ -69,7 +69,7 @@ public class MapCommands {
         }
     }
 
-    @Command(aliases = {"next", "nextmap", "nm", "mn", "mapnext"}, desc = "Shows next map.", usage = "")
+    @Command(aliases = {"next", "nextmap", "nm", "mn", "mapnext"}, desc = "Shows next map.")
     public static void next(final CommandContext cmd, CommandSender sender) {
         LoadedMap next = GameHandler.getGameHandler().getCycle().getMap();
         if (next.getAuthors().size() == 1) {
