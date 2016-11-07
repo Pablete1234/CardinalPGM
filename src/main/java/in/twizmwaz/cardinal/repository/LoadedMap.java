@@ -125,8 +125,12 @@ public class LoadedMap {
                         .map(Contributor::getName).collect(Collectors.toList())));
     }
 
+    public ChatMessage toIndexedLongMessage() {
+        return new UnlocalizedChatMessage("${index}. " + ChatColor.YELLOW + "#" + id + " {0}", toChatMessage());
+    }
+
     public ChatMessage toIndexedMessage() {
-        return new UnlocalizedChatMessage("${index}. " + toChatMessage());
+        return new UnlocalizedChatMessage("${index}. {0}", toChatMessage());
     }
 
 }

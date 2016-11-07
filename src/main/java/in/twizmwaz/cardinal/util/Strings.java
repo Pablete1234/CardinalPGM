@@ -3,6 +3,7 @@ package in.twizmwaz.cardinal.util;
 import in.twizmwaz.cardinal.chat.ChatConstant;
 import in.twizmwaz.cardinal.chat.ChatMessage;
 import in.twizmwaz.cardinal.chat.LocalizedChatMessage;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.util.ChatPaginator;
 
@@ -11,7 +12,7 @@ import java.text.DecimalFormat;
 public class Strings {
 
     public static int timeStringToSeconds(String input) {
-        return (int)timeStringToExactSeconds(input);
+        return (int) timeStringToExactSeconds(input);
     }
 
     public static double timeStringToExactSeconds(String input) {
@@ -138,10 +139,9 @@ public class Strings {
     }
 
     public static String padMessage(String message, ChatColor dashColor, String c, int maxLen) {
-        message = " " + message + " ";
         String dashes = ChatColor.STRIKETHROUGH +
-                Strings.repeat(c, (maxLen - ChatColor.stripColor(message).length() - 2) / (c.length() * 2));
-        return dashColor + dashes + ChatColor.RESET + message + ChatColor.RESET + dashColor + dashes;
+                Strings.repeat(c, (maxLen - ChatColor.stripColor(message).length() - 1) / (c.length() * 2));
+        return dashColor + dashes + ChatColor.RESET + " " + message + " " + ChatColor.RESET + dashColor + dashes;
     }
 
     public static ChatMessage page(int index, int max) {
@@ -190,6 +190,7 @@ public class Strings {
 
     /**
      * Simplifies a string by making it lowercase and removing spaces.
+     *
      * @return The string in lowercase without spaces
      */
     public static String simplify(String string) {
@@ -198,6 +199,7 @@ public class Strings {
 
     /**
      * Checks checks if string1 starts with string2, used for user inputs
+     *
      * @return if string1 simplified starts win string2 simplified
      */
     public static boolean matchString(String string1, String string2) {

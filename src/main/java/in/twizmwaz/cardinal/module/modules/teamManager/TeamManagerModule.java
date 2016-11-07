@@ -14,8 +14,10 @@ import in.twizmwaz.cardinal.util.Contributor;
 import in.twizmwaz.cardinal.util.Players;
 import in.twizmwaz.cardinal.util.Strings;
 import in.twizmwaz.cardinal.util.Teams;
+import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -23,9 +25,15 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.permissions.Permission;
+import org.bukkit.permissions.PermissionAttachment;
+import org.bukkit.permissions.PermissionAttachmentInfo;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.util.ChatPaginator;
 
+import java.util.Collection;
 import java.util.Locale;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class TeamManagerModule implements Module {
@@ -75,6 +83,7 @@ public class TeamManagerModule implements Module {
         for (Player player : Bukkit.getOnlinePlayers()) {
             sendMapMessage(player);
         }
+        sendMapMessage(Bukkit.getConsoleSender());
     }
 
     private void sendMapMessage(CommandSender player) {
@@ -83,14 +92,14 @@ public class TeamManagerModule implements Module {
         for (String line : lines) {
             player.sendMessage(" " + ChatColor.BLUE + line);
         }
-        String result = ChatColor.DARK_GRAY + new LocalizedChatMessage(ChatConstant.GENERIC_CREATED_BY,
+        lines = ChatUtil.wordWrap(ChatColor.DARK_GRAY + new LocalizedChatMessage(ChatConstant.GENERIC_CREATED_BY,
                 ChatUtil.toChatMessage(match.getLoadedMap().getAuthors().stream().map(Contributor::getDisplayName)
-                        .collect(Collectors.toList()), ChatColor.DARK_AQUA, ChatColor.DARK_GRAY)).getMessage(ChatUtil.getLocale(player));
-        lines = ChatPaginator.wordWrap(result, 40);
+                        .collect(Collectors.toList()), ChatColor.DARK_AQUA, ChatColor.DARK_GRAY))
+                .getMessage(ChatUtil.getLocale(player)), 32);
         for (String line : lines) {
-            player.sendMessage(line);
+            player.sendMessage(" " + line);
         }
-        player.sendMessage(ChatColor.STRIKETHROUGH + Strings.repeat("-", 40));
+        player.sendMessage(ChatColor.STRIKETHROUGH + Strings.repeat("-", 32));
     }
 
     @EventHandler
