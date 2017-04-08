@@ -37,14 +37,8 @@ public class MovableStructure implements Moveable, Listener {
         for (Block block : payload.getBlocks()) {
             block.setType(Material.AIR);
         }
-        task = Bukkit.getScheduler().scheduleSyncRepeatingTask(Cardinal.getInstance(), new Runnable() {
-            @Override
-            public void run() {
-                for (MovableBlock moveableBlock : moveableBlocks) {
-                    moveableBlock.handleFallingSand();
-                }
-            }
-        }, 500L, 500L);
+        task = Bukkit.getScheduler().scheduleSyncRepeatingTask(Cardinal.getInstance(),
+                () -> moveableBlocks.forEach(MovableBlock::handleFallingSand), 500L, 500L);
         Bukkit.getPluginManager().registerEvents(this, Cardinal.getInstance());
     }
 
@@ -57,11 +51,11 @@ public class MovableStructure implements Moveable, Listener {
         for (MovableBlock moveableBlock : moveableBlocks) {
             moveableBlock.move(vec);
         }
-        for (Player player : Bukkit.getOnlinePlayers()) {
+        /*for (Player player : Bukkit.getOnlinePlayers()) {
             if (player.getLocation().toVector().isInAABB(min, max)) {
                 player.teleportRelative(vec, 0, 0);
             }
-        }
+        }*/
         min.add(vec);
         max.add(vec);
     }

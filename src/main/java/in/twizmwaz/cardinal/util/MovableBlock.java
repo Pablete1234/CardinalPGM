@@ -34,7 +34,7 @@ public class MovableBlock implements Listener {
     public MovableBlock(Block block) {
         solid = block.getType().isSolid();
 
-        ids = solid ? new ArrayList<Integer>(4) : new ArrayList<Integer>(2);
+        ids = solid ? new ArrayList<>(4) : new ArrayList<>(2);
 
         FallingBlock fallingSand = block.getWorld().spawn(block.getLocation(), FallingBlock.class);
         fallingSand.setGravity(false);

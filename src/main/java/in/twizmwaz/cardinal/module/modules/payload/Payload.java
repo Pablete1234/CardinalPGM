@@ -17,8 +17,11 @@ public class Payload implements TaskedModule {
 
     private Moveable moveable;
     private Location location;
+    private long nextUpdate;
+    private int rate;
+    private double distance;
 
-    Payload(RegionModule payload, PointRegion start) {
+    Payload(RegionModule payload, PointRegion start, int rate, double distance) {
         this.moveable = new MovableStructure(payload);
         Block block = GameHandler.getGameHandler().getMatchWorld().getBlockAt(start.getLocation());
         if (block.getType().equals(Material.RAILS)) {
@@ -26,6 +29,8 @@ public class Payload implements TaskedModule {
         } else {
             Bukkit.getLogger().log(Level.WARNING, "Payload won't work, as the first block is not a rail!");
         }
+        this.rate = rate;
+        this.distance = distance;
     }
 
     public void unload() {
@@ -34,12 +39,16 @@ public class Payload implements TaskedModule {
     }
 
     public void run() {
-        Block block = GameHandler.getGameHandler().getMatchWorld().getBlockAt(0, 1, 0);
+        if (nextUpdate <= System.currentTimeMillis()) {
+            nextUpdate = System.currentTimeMillis() + rate;
 
-        if (block.getType() == Material.STONE) {
-            moveable.move(new Vector(0, 0, 0.1));
-        } else if (block.getType() == Material.DIRT) {
-            moveable.move(new Vector(0, 0, -0.1));
+            Block block = GameHandler.getGameHandler().getMatchWorld().getBlockAt(0, 1, 0);
+
+            if (block.getType() == Material.STONE) {
+                moveable.move(new Vector(0, 0, distance));
+            } else if (block.getType() == Material.DIRT) {
+                moveable.move(new Vector(0, 0, distance * -1));
+            }
         }
     }
 

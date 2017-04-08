@@ -7,6 +7,8 @@ import in.twizmwaz.cardinal.module.modules.regions.RegionModule;
 import in.twizmwaz.cardinal.module.modules.regions.RegionModuleBuilder;
 import in.twizmwaz.cardinal.module.modules.regions.parsers.PointParser;
 import in.twizmwaz.cardinal.module.modules.regions.type.PointRegion;
+import in.twizmwaz.cardinal.util.Numbers;
+import in.twizmwaz.cardinal.util.Parser;
 import org.jdom2.Element;
 
 public class PayloadBuilder implements ModuleBuilder {
@@ -27,9 +29,12 @@ public class PayloadBuilder implements ModuleBuilder {
     }
 
     private Payload parsePayload(Element... elements) {
-        RegionModule payload = RegionModuleBuilder.getAttributeOrChild("payload", elements);
-        PointRegion minecart = new PointRegion(new PointParser(elements[0]));
-        return new Payload(payload, minecart);
+        return new Payload(
+                RegionModuleBuilder.getAttributeOrChild("payload", elements),
+                new PointRegion(new PointParser(elements[0])),
+                Numbers.parseInt(Parser.getOrderedAttribute("rate", elements), 100),
+                Numbers.parseDouble(Parser.getOrderedAttribute("distance", elements), 0.1)
+                );
     }
 
 
